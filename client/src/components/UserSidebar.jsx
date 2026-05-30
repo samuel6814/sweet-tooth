@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   ScanFace, 
@@ -11,6 +11,7 @@ import {
   LogOut,
   X
 } from 'lucide-react';
+import { authClient } from '../lib/auth';
 
 const SidebarContainer = styled.aside`
   width: 260px;
@@ -113,6 +114,14 @@ const BottomActions = styled.div`
 `;
 
 const UserSidebar = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    if (onClose) onClose();
+    navigate('/');
+  };
+
   return (
     <SidebarContainer $isOpen={isOpen}>
       <MobileHeader>
@@ -152,7 +161,7 @@ const UserSidebar = ({ isOpen, onClose }) => {
           <Settings className="icon" size={20} />
           Settings
         </StyledNavLink>
-        <StyledNavLink to="/" style={{ color: '#a93100' }}>
+        <StyledNavLink as="button" onClick={handleSignOut} style={{ color: '#a93100', border: 'none', background: 'none', cursor: 'pointer', width: '100%', font: 'inherit', textAlign: 'left' }}>
           <LogOut className="icon" size={20} color="#a93100" />
           Log Out
         </StyledNavLink>

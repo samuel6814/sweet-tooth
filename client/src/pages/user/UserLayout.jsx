@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 import UserNavbar from '../../components/UserNavbar';
 import UserSidebar from '../../components/UserSidebar';
+import { authClient } from '../../lib/auth';
 
 const LayoutWrapper = styled.div`
   display: flex;
@@ -41,11 +43,32 @@ const MobileOverlay = styled.div`
   }
 `;
 
+const LoadingScreen = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: #00658d;
+`;
+
 const UserLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { data: session, isPending } = authClient.useSession();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
+
+  if (isPending) {
+    return (
+      <LoadingScreen>
+        <Loader2 className="animate-spin" size={36} />
+      </LoadingScreen>
+    );
+  }
+
+  if (!session?.user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <LayoutWrapper>

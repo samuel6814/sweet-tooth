@@ -127,37 +127,29 @@ const NotificationItem = styled.div`
   }
 `;
 
-const MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    title: "Monthly Scan Due",
-    message: "It's time for your May check-up! Upload a fresh photo of your teeth to track your progress.",
-    time: "2 hours ago",
-    icon: <Camera size={18} />,
-    type: "alert",
-    unread: true,
-  },
-  {
-    id: 2,
-    title: "Estimate Saved",
-    message: "Your financial estimate for Orthodontic Braces has been saved to your dashboard.",
-    time: "1 day ago",
-    icon: <FileText size={18} />,
-    type: "primary",
-    unread: true,
-  },
-  {
-    id: 3,
-    title: "Welcome to Sweet Tooth!",
-    message: "Your profile is set up. Let's start by taking your first AI oral health scan.",
-    time: "3 days ago",
-    icon: <Sparkles size={18} />,
-    type: "success",
-    unread: false,
-  }
-];
+// No MOCK_NOTIFICATIONS
 
 const NotificationsDropdown = ({ isOpen }) => {
+  const [notifications, setNotifications] = React.useState([]);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/notifications`)
+        .then(res => res.json())
+        .then(data => setNotifications(data))
+        .catch(err => console.error(err));
+    }
+  }, [isOpen]);
+
+  const getIcon = (type) => {
+    switch (type) {
+      case 'alert': return <Camera size={18} />;
+      case 'primary': return <FileText size={18} />;
+      case 'success': return <Sparkles size={18} />;
+      default: return <FileText size={18} />;
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -172,10 +164,10 @@ const NotificationsDropdown = ({ isOpen }) => {
             <button>Mark all as read</button>
           </Header>
           <NotificationList>
-            {MOCK_NOTIFICATIONS.map((notif) => (
+            {notifications.map((notif) => (
               <NotificationItem key={notif.id} $unread={notif.unread}>
-                <div className={`icon-box ${notif.type}`}>
-                  {notif.icon}
+                <div className={`icon-box ${notif.type || 'primary'}`}>
+                  {getIcon(notif.type)}
                 </div>
                 <div className="content">
                   <h4>{notif.title}</h4>

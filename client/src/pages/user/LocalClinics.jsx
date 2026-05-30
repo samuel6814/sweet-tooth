@@ -153,13 +153,6 @@ const ActionGrid = styled.div`
   }
 `;
 
-const MOCK_CLINICS = [
-  { id: 1, name: "Kumasi Premier Dental", address: "Bantama High St, Near Komfo Anokye", distance: "1.2 km", rating: 4.8, reviews: 124 },
-  { id: 2, name: "Ashanti Orthodontics", address: "Adum, Close to Central Market", distance: "4.1 km", rating: 4.9, reviews: 210 },
-  { id: 3, name: "Oforikrom Smile Clinic", address: "Accra Rd, Oforikrom", distance: "3.5 km", rating: 4.6, reviews: 89 },
-  { id: 4, name: "KNUST Dental Services", address: "University Campus, Tech", distance: "6.0 km", rating: 4.7, reviews: 156 },
-];
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -171,6 +164,41 @@ const itemVariants = {
 };
 
 const LocalClinics = () => {
+  const [clinics, setClinics] = React.useState([]);
+  const [loadingLoc, setLoadingLoc] = React.useState(false);
+
+  React.useEffect(() => {
+    // Default fetch for a standard location if none provided
+    fetchClinics(6.6732, -1.5674); // Default to Kumasi coords
+  }, []);
+
+  const fetchClinics = (lat, lng) => {
+    fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/clinics/search?lat=${lat}&lng=${lng}`)
+      .then(res => res.json())
+      .then(data => setClinics(data))
+      .catch(err => console.error(err));
+  };
+
+  const handleUseLocation = () => {
+    setLoadingLoc(true);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fetchClinics(position.coords.latitude, position.coords.longitude);
+          setLoadingLoc(false);
+        },
+        (error) => {
+          console.error("Error getting location", error);
+          alert("Could not get your location. Please allow location access.");
+          setLoadingLoc(false);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser");
+      setLoadingLoc(false);
+    }
+  };
+
   return (
     <PageContainer>
       <Header>
@@ -178,14 +206,22 @@ const LocalClinics = () => {
           <h1>Saved Clinics</h1>
           <p>Manage your preferred specialists and upcoming consultations.</p>
         </div>
-        <SearchBox>
-          <Search size={18} color="#8fa3b0" />
-          <input type="text" placeholder="Search Kumasi area..." />
-        </SearchBox>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <button 
+            onClick={handleUseLocation}
+            style={{ padding: '0.5rem 1rem', background: '#e1f2ff', color: '#00658d', border: 'none', borderRadius: '9999px', cursor: 'pointer', fontWeight: 700, fontFamily: "'Hanken Grotesk', sans-serif" }}
+          >
+            {loadingLoc ? 'Locating...' : 'Use My Location'}
+          </button>
+          <SearchBox>
+            <Search size={18} color="#8fa3b0" />
+            <input type="text" placeholder="Search area..." />
+          </SearchBox>
+        </div>
       </Header>
 
       <ClinicsGrid variants={containerVariants} initial="hidden" animate="visible">
-        {MOCK_CLINICS.map(clinic => (
+        {clinics.map(clinic => (
           <ClinicCard key={clinic.id} variants={itemVariants}>
             <ClinicInfo>
               <h3>{clinic.name}</h3>

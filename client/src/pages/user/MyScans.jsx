@@ -163,13 +163,16 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-const MOCK_SCANS = [
-  { id: 1, date: "May 15, 2026", score: 85, issues: ["Mild crowding on lower anterior"], improvements: ["No new cavities detected"] },
-  { id: 2, date: "Nov 10, 2025", score: 82, issues: ["Plaque buildup on molars", "Mild crowding"], improvements: [] },
-  { id: 3, date: "May 05, 2025", score: 78, issues: ["Gum inflammation noted", "Plaque buildup"], improvements: [] },
-];
-
 const MyScans = () => {
+  const [scans, setScans] = React.useState([]);
+
+  React.useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/scans`)
+      .then(res => res.json())
+      .then(data => setScans(data))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
     <PageContainer>
       <Header>
@@ -181,7 +184,7 @@ const MyScans = () => {
       </Header>
 
       <ScansGrid variants={containerVariants} initial="hidden" animate="visible">
-        {MOCK_SCANS.map((scan) => (
+        {scans.map((scan) => (
           <ScanCard key={scan.id} variants={itemVariants}>
             <ScanImageMock>
               <Activity size={48} opacity={0.2} />

@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { Search, Bell, Plus, Menu, Home } from 'lucide-react';
+import { Search, Bell, Plus, Menu, Home, LogOut } from 'lucide-react';
 import NotificationsDropdown from './NotificationsDropdown';
+import { authClient } from '../lib/auth';
+import { useNavigate } from 'react-router-dom';
 
 // --- Styled Components ---
 
@@ -180,15 +182,73 @@ const UserAvatar = styled.button`
   &:hover { border-color: #00658d; }
 `;
 
+const ProfileDropdownMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 101, 141, 0.15);
+  border: 1px solid #e0e3e5;
+  width: 200px;
+  overflow: hidden;
+  z-index: 50;
+  display: ${props => props.$isOpen ? 'flex' : 'none'};
+  flex-direction: column;
+
+  .user-info {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e3e5;
+    background-color: #f7f9fb;
+    
+    p { margin: 0; }
+    .name { font-weight: 700; color: #191c1e; font-size: 0.95rem; }
+    .email { color: #8fa3b0; font-size: 0.8rem; margin-top: 0.2rem; }
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 0.95rem;
+    color: #d32f2f;
+    font-weight: 600;
+    transition: background-color 0.2s;
+
+    &:hover { background-color: #ffebee; }
+  }
+`;
+
 const UserNavbar = ({ onMenuClick }) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const notifRef = useRef(null);
+  const profileRef = useRef(null);
+  const navigate = useNavigate();
+
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    navigate('/login');
+  };
 
   // Close the dropdown if the user clicks outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setIsNotifOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
       }
     };
 
@@ -238,10 +298,21 @@ const UserNavbar = ({ onMenuClick }) => {
             
             <NotificationsDropdown isOpen={isNotifOpen} />
           </NotificationWrapper>
-          
-          <UserAvatar title="Profile Options">
-            JD
-          </UserAvatar>
+          <div ref={profileRef} style={{ position: 'relative' }}>
+            <UserAvatar title="Profile Options" onClick={() => setIsProfileOpen(!isProfileOpen)}>
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'JD'}
+            </UserAvatar>
+
+            <ProfileDropdownMenu $isOpen={isProfileOpen}>
+              <div className="user-info">
+                <p className="name">{user?.name || 'Guest'}</p>
+                <p className="email">{user?.email || 'Not logged in'}</p>
+              </div>
+              <button className="action-btn" onClick={handleSignOut}>
+                <LogOut size={18} /> Sign Out
+              </button>
+            </ProfileDropdownMenu>
+          </div>
         </RightSection>
       </NavInner>
     </NavContainer>

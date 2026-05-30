@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Clock, 
@@ -506,66 +507,36 @@ const SendButton = styled.button`
   &:active { transform: scale(0.95); }
 `;
 
-// --- Mock Data ---
-
-const MOCK_TREATMENT_DATA = {
-  title: "Orthodontic Braces",
-  description: "Comprehensive structural alignment solutions for a perfectly straight, healthy smile. Ideal for correcting overbites, underbites, and severe crowding.",
-  duration: "12 - 24 Months",
-  cost: {
-    min: 15000, 
-    max: 45000
-  },
-  types: [
-    {
-      name: "Traditional Metal Braces",
-      desc: "High-grade stainless steel brackets and wires. The most durable and widely used system.",
-      target: "Best for: Severe crowding and complex bite issues."
-    },
-    {
-      name: "Ceramic (Clear) Braces",
-      desc: "Functions exactly like metal braces but uses tooth-colored or clear brackets to blend in with your teeth.",
-      target: "Best for: Adults and older teens seeking a less noticeable option."
-    },
-    {
-      name: "Lingual Braces",
-      desc: "Custom-made brackets attached to the back (inside) of the teeth, rendering them completely invisible from the front.",
-      target: "Best for: Professionals requiring maximum aesthetic discretion."
-    }
-  ],
-  benefits: [
-    "Dramatically improves bite function and chewing efficiency.",
-    "Makes teeth easier to clean, reducing long-term risk of cavities.",
-    "Corrects jaw alignment, alleviating potential jaw pain or TMJ issues.",
-    "Provides a permanent, highly aesthetic resulting smile."
-  ],
-  sideEffects: [
-    "Mild soreness for 3-5 days after adjustments.",
-    "Requires significant dedication to oral hygiene (flossing takes longer).",
-    "Dietary restrictions (avoiding hard, sticky, or chewy foods).",
-    "Slight speech impediment during the initial adjustment week."
-  ],
-  products: [
-    { id: 1, name: "Orthodontic Wax", price: 45, desc: "Relieves irritation from brackets." },
-    { id: 2, name: "Interdental Brushes", price: 75, desc: "Essential for cleaning around wires." },
-    { id: 3, name: "Fluoride Mouthwash", price: 120, desc: "Strengthens enamel during treatment." }
-  ],
-  localClinics: [
-    { id: 1, name: "Kumasi Premier Dental", address: "Bantama High St", distance: "1.2 km", rating: 4.8, reviews: 124, estPrice: 15500 },
-    { id: 2, name: "Oforikrom Smile Clinic", address: "Accra Rd, Oforikrom", distance: "3.5 km", rating: 4.6, reviews: 89, estPrice: 14200 },
-    { id: 3, name: "Ashanti Orthodontics", address: "Adum", distance: "4.1 km", rating: 4.9, reviews: 210, estPrice: 16000 }
-  ]
-};
-
 const TreatmentDetail = () => {
+  const { slug = 'braces' } = useParams();
+  const [treatmentData, setTreatmentData] = useState(null);
+  const [notFound, setNotFound] = useState(false);
   const [inputText, setInputText] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      sender: 'bot',
-      text: "Hi! I'm your Sweet Tooth AI consultant. Upload a clear photo of your teeth, or ask me any specific questions you have about getting braces, and I'll give you a personalized analysis."
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
+
+  React.useEffect(() => {
+    setTreatmentData(null);
+    setNotFound(false);
+    fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/treatments/${slug}`)
+      .then(res => {
+        if (!res.ok) throw new Error('not found');
+        return res.json();
+      })
+      .then(data => {
+        setTreatmentData(data);
+        setMessages([
+          {
+            id: 1,
+            sender: 'bot',
+            text: `Hi! I'm your Sweet Tooth AI consultant. Upload a clear photo of your teeth, or ask me any specific questions about ${data.chatTopic || data.title.toLowerCase()}, and I'll give you a personalized analysis.`
+          }
+        ]);
+      })
+      .catch(err => {
+        console.error(err);
+        setNotFound(true);
+      });
+  }, [slug]);
 
   const handleSend = () => {
     if (!inputText.trim()) return;
@@ -583,13 +554,32 @@ const TreatmentDetail = () => {
     }, 1000);
   };
 
+  if (notFound) {
+    return (
+      <PageContainer>
+        <Navbar />
+        <Content>
+          <Header>
+            <h1>Treatment Not Found</h1>
+            <p>We couldn't find details for this treatment. Please head back to the treatments catalog and pick one.</p>
+          </Header>
+        </Content>
+        <Footer />
+      </PageContainer>
+    );
+  }
+
+  if (!treatmentData) {
+    return <PageContainer><Navbar /><Content><p>Loading...</p></Content><Footer /></PageContainer>;
+  }
+
   return (
     <PageContainer>
       <Navbar />
       <Content>
         <Header>
-          <h1>{MOCK_TREATMENT_DATA.title}</h1>
-          <p>{MOCK_TREATMENT_DATA.description}</p>
+          <h1>{treatmentData.title}</h1>
+          <p>{treatmentData.description}</p>
         </Header>
 
         <LayoutGrid>
@@ -599,7 +589,7 @@ const TreatmentDetail = () => {
                 <div className="icon-box"><Clock size={24} /></div>
                 <div>
                   <h4>Avg. Duration</h4>
-                  <p>{MOCK_TREATMENT_DATA.duration}</p>
+                  <p>{treatmentData.duration}</p>
                 </div>
               </StatCard>
               <StatCard>
@@ -607,16 +597,16 @@ const TreatmentDetail = () => {
                 <div>
                   <h4>Est. Cost Range</h4>
                   <p>
-                    <Currency amount={MOCK_TREATMENT_DATA.cost.min} /> - <Currency amount={MOCK_TREATMENT_DATA.cost.max} />
+                    <Currency amount={treatmentData.cost.min} /> - <Currency amount={treatmentData.cost.max} />
                   </p>
                 </div>
               </StatCard>
             </QuickStats>
 
             <SectionBox>
-              <h3><Sparkles size={32} color="#ff5722"/> Types of Braces</h3>
+              <h3><Sparkles size={32} color="#ff5722"/> {treatmentData.sectionLabel || 'Treatment Options'}</h3>
               <TypesGrid>
-                {MOCK_TREATMENT_DATA.types.map((type, i) => (
+                {treatmentData.types.map((type, i) => (
                   <TypeItem key={i}>
                     <h4>{type.name}</h4>
                     <p>{type.desc}</p>
@@ -629,7 +619,7 @@ const TreatmentDetail = () => {
             <SectionBox>
               <h3><CheckCircle2 size={32} color="#00658d"/> Long-term Benefits</h3>
               <List>
-                {MOCK_TREATMENT_DATA.benefits.map((benefit, i) => (
+                {treatmentData.benefits.map((benefit, i) => (
                   <li key={i}>
                     <CheckCircle2 size={20} color="#ff5722" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <span>{benefit}</span>
@@ -641,7 +631,7 @@ const TreatmentDetail = () => {
             <SectionBox>
               <h3><AlertTriangle size={32} color="#00658d"/> Things to Consider</h3>
               <List>
-                {MOCK_TREATMENT_DATA.sideEffects.map((effect, i) => (
+                {treatmentData.sideEffects.map((effect, i) => (
                   <li key={i}>
                     <AlertTriangle size={20} color="#ff5722" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <span>{effect}</span>
@@ -656,7 +646,7 @@ const TreatmentDetail = () => {
                 Maintain optimal oral health during your orthodontic journey with these essentials.
               </p>
               <ProductGrid>
-                {MOCK_TREATMENT_DATA.products.map((product) => (
+                {treatmentData.products.map((product) => (
                   <ProductCard key={product.id}>
                     <h5>{product.name}</h5>
                     <p>{product.desc}</p>
@@ -676,7 +666,7 @@ const TreatmentDetail = () => {
               </LocationHeader>
               
               <ClinicList>
-                {MOCK_TREATMENT_DATA.localClinics.map((clinic) => (
+                {treatmentData.localClinics.map((clinic) => (
                   <ClinicCard key={clinic.id}>
                     <div className="clinic-details">
                       <h4>{clinic.name}</h4>
@@ -733,7 +723,7 @@ const TreatmentDetail = () => {
                   <button className="upload-btn" title="Upload Scan"><Paperclip size={20} /></button>
                   <input 
                     type="text" 
-                    placeholder="Ask about braces or upload your scan..." 
+                    placeholder={`Ask about ${treatmentData.chatTopic || 'this treatment'} or upload your scan...`}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}

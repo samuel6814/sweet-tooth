@@ -54,7 +54,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="cost-estimates" element={<CostEstimates />} />
           <Route path="scan" element={<NewScan />} />
 
-          <Route path="treatments/braces" element={<TreatmentDetail />} />
+          <Route path="treatments/:slug" element={<TreatmentDetail />} />
 
           {/* Protected User Dashboard Routes */}
           <Route path="dashboard" element={<UserLayout />}>

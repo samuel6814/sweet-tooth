@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { authClient } from '../../lib/auth';
 
 // --- Styled Components ---
 
@@ -222,11 +224,50 @@ const formVariants = {
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState('login');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Temporary console log, will be replaced with better-auth logic later
-    console.log(`${activeTab} form submitted`);
+    setLoading(true);
+    setError(null);
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+    });
+
+    setLoading(false);
+    if (error) {
+      setError(error.message || 'Failed to sign in');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const name = e.target.name.value;
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const { data, error } = await authClient.signUp.email({
+      email,
+      password,
+      name,
+    });
+
+    setLoading(false);
+    if (error) {
+      setError(error.message || 'Failed to create account');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (
@@ -248,17 +289,23 @@ const Auth = () => {
             <TabsContainer>
               <TabButton 
                 $active={activeTab === 'login'} 
-                onClick={() => setActiveTab('login')}
+                onClick={() => { setActiveTab('login'); setError(null); }}
               >
                 Log In
               </TabButton>
               <TabButton 
                 $active={activeTab === 'signup'} 
-                onClick={() => setActiveTab('signup')}
+                onClick={() => { setActiveTab('signup'); setError(null); }}
               >
                 Sign Up
               </TabButton>
             </TabsContainer>
+
+            {error && (
+              <div style={{ color: '#d32f2f', backgroundColor: '#ffebee', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem', fontFamily: 'Hanken Grotesk, sans-serif' }}>
+                {error}
+              </div>
+            )}
 
             <AnimatePresence mode="wait">
               {activeTab === 'login' ? (
@@ -268,20 +315,20 @@ const Auth = () => {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  onSubmit={handleSubmit}
+                  onSubmit={handleLogin}
                 >
                   <InputGroup>
                     <label>Email Address</label>
-                    <Input type="email" placeholder="hello@example.com" required />
+                    <Input name="email" type="email" placeholder="hello@example.com" required />
                   </InputGroup>
                   <InputGroup>
                     <label>Password</label>
-                    <Input type="password" placeholder="••••••••" required />
+                    <Input name="password" type="password" placeholder="••••••••" required />
                   </InputGroup>
                   <ForgotPassword href="#">Forgot your password?</ForgotPassword>
                   
-                  <SubmitButton whileTap={{ scale: 0.98 }}>
-                    Sign In <ArrowRight size={20} />
+                  <SubmitButton whileTap={loading ? {} : { scale: 0.98 }} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
+                    {loading ? <Loader2 className="animate-spin" size={20} /> : "Sign In"} <ArrowRight size={20} />
                   </SubmitButton>
                 </Form>
               ) : (
@@ -291,23 +338,23 @@ const Auth = () => {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  onSubmit={handleSubmit}
+                  onSubmit={handleSignup}
                 >
                   <InputGroup>
                     <label>Full Name</label>
-                    <Input type="text" placeholder="John Doe" required />
+                    <Input name="name" type="text" placeholder="John Doe" required />
                   </InputGroup>
                   <InputGroup>
                     <label>Email Address</label>
-                    <Input type="email" placeholder="hello@example.com" required />
+                    <Input name="email" type="email" placeholder="hello@example.com" required />
                   </InputGroup>
                   <InputGroup>
                     <label>Password</label>
-                    <Input type="password" placeholder="Create a strong password" required />
+                    <Input name="password" type="password" placeholder="Create a strong password" required />
                   </InputGroup>
                   
-                  <SubmitButton whileTap={{ scale: 0.98 }}>
-                    Create Account <ArrowRight size={20} />
+                  <SubmitButton whileTap={loading ? {} : { scale: 0.98 }} disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
+                    {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Account"} <ArrowRight size={20} />
                   </SubmitButton>
                 </Form>
               )}

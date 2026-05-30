@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "| Component | Technology | |------------|------------| | Database | Neon (Serverless PostgreSQL) | | Authentication | BetterAuth (Handles sessions, OAuth, and email/password securely) | | Image Storage | Cloudinary (Handles image transformation, optimization, and secure storage) | | AI Engine | Google Gemini API (Processes dental scans and provides natural language feedback) |",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^2.7.0",
+    "@prisma/client": "^5.22.0",
+    "better-auth": "^1.6.12",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "multer": "^2.1.1",
+    "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "@better-auth/cli": "^1.4.21",
+    "nodemon": "^3.1.14",
+    "prisma": "^5.22.0"
+  }
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { authClient } from '../../lib/auth';
 import { 
   UploadCloud, 
   Camera, 
@@ -301,10 +302,13 @@ const itemVariants = {
 };
 
 const DashboardOverview = () => {
+  const { data: session } = authClient.useSession();
+  const firstName = session?.user?.name ? session.user.name.split(' ')[0] : 'there';
+
   return (
     <DashboardContainer>
       <Header>
-        <h1>Welcome back, JD!</h1>
+        <h1>Welcome back, {firstName}!</h1>
         <p>Here is an overview of your oral health and treatment progress.</p>
       </Header>
 
