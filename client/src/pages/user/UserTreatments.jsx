@@ -175,7 +175,7 @@ const UserTreatments = () => {
             <div className="status active">Consultation In Progress</div>
           </Info>
           <ActionArea>
-            <p className="cost">Est: <Currency amount={15000} /> - <Currency amount={45000} /></p>
+            <p className="cost">Est: <Currency amount={3000} /> - <Currency amount={20000} /></p>
             <Link to="/treatments/braces">Resume AI Chat <ArrowRight size={16} /></Link>
           </ActionArea>
         </TreatmentCard>

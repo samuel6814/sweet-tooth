@@ -131,7 +131,7 @@ const AIAnalysis = () => {
           
           <GraphicContainer initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.8 }}>
             <div className="glow" />
-            <img src="/tooth1.png" alt="3D Tooth AI Analysis" />
+            <img src="/tooth1.webp" alt="3D Tooth AI Analysis" loading="lazy" decoding="async" />
           </GraphicContainer>
         </AnalysisGrid>
       </Content>

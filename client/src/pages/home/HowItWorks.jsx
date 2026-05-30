@@ -108,7 +108,7 @@ const HowItWorks = () => {
         <Grid>
           <ImageWrapper>
             <div className="main-img">
-              <img src="/tooth2.jpg" alt="AI Dental Scanning Process" />
+              <img src="/tooth2.webp" alt="AI Dental Scanning Process" loading="lazy" decoding="async" />
             </div>
           </ImageWrapper>
           

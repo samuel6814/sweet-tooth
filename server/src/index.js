@@ -6,6 +6,7 @@ import { toNodeHandler } from "better-auth/node";
 
 import clinicsRoutes from "./routes/clinics.routes.js";
 import treatmentsRoutes from "./routes/treatments.routes.js";
+import aiRoutes from "./routes/ai.routes.js";
 
 
 
@@ -34,8 +35,9 @@ app.use(cors({
 // read the raw request body. toNodeHandler bridges Express <-> Web Request.
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-// JSON body parser for the rest of the app (after the auth handler)
-app.use(express.json());
+// JSON body parser for the rest of the app (after the auth handler).
+// Limit raised to fit base64 image uploads sent to the AI consultant.
+app.use(express.json({ limit: "12mb" }));
 
 // ---------------------------------------------------------
 // ROUTES
@@ -43,6 +45,7 @@ app.use(express.json());
 
 app.use("/api/clinics", clinicsRoutes);
 app.use("/api/treatments", treatmentsRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get("/api/scans", async (req, res) => {
     res.json([

@@ -166,6 +166,7 @@ const itemVariants = {
 const LocalClinics = () => {
   const [clinics, setClinics] = React.useState([]);
   const [loadingLoc, setLoadingLoc] = React.useState(false);
+  const [query, setQuery] = React.useState('');
 
   React.useEffect(() => {
     // Default fetch for a standard location if none provided
@@ -177,6 +178,24 @@ const LocalClinics = () => {
       .then(res => res.json())
       .then(data => setClinics(data))
       .catch(err => console.error(err));
+  };
+
+  const visibleClinics = clinics.filter((c) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      (c.name || '').toLowerCase().includes(q) ||
+      (c.address || '').toLowerCase().includes(q)
+    );
+  });
+
+  const handleCall = (clinic) => {
+    window.location.href = `tel:${(clinic.phone || '').replace(/\s+/g, '')}`;
+  };
+
+  const handleBook = (clinic) => {
+    const q = encodeURIComponent(`${clinic.name} ${clinic.address || ''}`.trim());
+    window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank', 'noopener');
   };
 
   const handleUseLocation = () => {
@@ -215,13 +234,18 @@ const LocalClinics = () => {
           </button>
           <SearchBox>
             <Search size={18} color="#8fa3b0" />
-            <input type="text" placeholder="Search area..." />
+            <input
+              type="text"
+              placeholder="Search by name or address..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </SearchBox>
         </div>
       </Header>
 
       <ClinicsGrid variants={containerVariants} initial="hidden" animate="visible">
-        {clinics.map(clinic => (
+        {visibleClinics.map(clinic => (
           <ClinicCard key={clinic.id} variants={itemVariants}>
             <ClinicInfo>
               <h3>{clinic.name}</h3>
@@ -236,11 +260,16 @@ const LocalClinics = () => {
               </div>
             </ClinicInfo>
             <ActionGrid>
-              <button className="secondary"><Phone size={16} /> Call Clinic</button>
-              <button className="primary"><ExternalLink size={16} /> Book Online</button>
+              <button className="secondary" onClick={() => handleCall(clinic)}><Phone size={16} /> Call Clinic</button>
+              <button className="primary" onClick={() => handleBook(clinic)}><ExternalLink size={16} /> Book Online</button>
             </ActionGrid>
           </ClinicCard>
         ))}
+        {visibleClinics.length === 0 && (
+          <p style={{ fontFamily: "'Hanken Grotesk', sans-serif", color: '#8fa3b0' }}>
+            No clinics match your search.
+          </p>
+        )}
       </ClinicsGrid>
     </PageContainer>
   );

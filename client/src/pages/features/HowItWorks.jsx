@@ -114,7 +114,7 @@ const HowItWorks = () => {
 
         <Grid>
           <ImageWrapper initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-            <img src="/tooth2.jpg" alt="Person scanning teeth" />
+            <img src="/tooth2.webp" alt="Person scanning teeth" loading="lazy" decoding="async" />
           </ImageWrapper>
 
           <StepsList>

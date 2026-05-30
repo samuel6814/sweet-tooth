@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { User, Bell, Lock, Save } from 'lucide-react';
+import { User, Bell, Lock, Save, Loader2, CheckCircle2 } from 'lucide-react';
+import { authClient } from '../../lib/auth';
 
 const PageContainer = styled.div`
   display: flex;
@@ -158,7 +159,89 @@ const SaveButton = styled.button`
   &:hover { background: #004c6b; }
 `;
 
+const Feedback = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: ${(props) => (props.$error ? '#ffebee' : '#e8f7ee')};
+  color: ${(props) => (props.$error ? '#c62828' : '#15803d')};
+`;
+
 const UserSettings = () => {
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [location, setLocation] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileMsg, setProfileMsg] = useState(null);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [savingPwd, setSavingPwd] = useState(false);
+  const [pwdMsg, setPwdMsg] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true);
+    setProfileMsg(null);
+    try {
+      const { error } = await authClient.updateUser({ name });
+      if (error) {
+        setProfileMsg({ error: true, text: error.message || 'Failed to update profile.' });
+      } else {
+        setProfileMsg({ error: false, text: 'Profile updated successfully.' });
+      }
+    } catch (err) {
+      setProfileMsg({ error: true, text: 'Something went wrong. Please try again.' });
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      setPwdMsg({ error: true, text: 'Please fill in both password fields.' });
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPwdMsg({ error: true, text: 'New password must be at least 8 characters.' });
+      return;
+    }
+    setSavingPwd(true);
+    setPwdMsg(null);
+    try {
+      const { error } = await authClient.changePassword({
+        currentPassword,
+        newPassword,
+        revokeOtherSessions: true,
+      });
+      if (error) {
+        setPwdMsg({ error: true, text: error.message || 'Failed to update password.' });
+      } else {
+        setPwdMsg({ error: false, text: 'Password updated successfully.' });
+        setCurrentPassword('');
+        setNewPassword('');
+      }
+    } catch (err) {
+      setPwdMsg({ error: true, text: 'Something went wrong. Please try again.' });
+    } finally {
+      setSavingPwd(false);
+    }
+  };
+
   return (
     <PageContainer>
       <Header>
@@ -171,17 +254,24 @@ const UserSettings = () => {
           <h3><User size={20} color="#00658d" /> Profile Information</h3>
           <FormGroup>
             <label>Full Name</label>
-            <input type="text" defaultValue="JD Doe" />
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
           </FormGroup>
           <FormGroup>
             <label>Email Address</label>
-            <input type="email" defaultValue="jd@example.com" />
+            <input type="email" value={email} disabled title="Email cannot be changed here" style={{ opacity: 0.7, cursor: 'not-allowed' }} />
           </FormGroup>
           <FormGroup>
             <label>Location</label>
-            <input type="text" defaultValue="Kumasi, Ghana" />
+            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Kumasi, Ghana" />
           </FormGroup>
-          <SaveButton><Save size={18} /> Save Changes</SaveButton>
+          {profileMsg && (
+            <Feedback $error={profileMsg.error}>
+              {!profileMsg.error && <CheckCircle2 size={16} />} {profileMsg.text}
+            </Feedback>
+          )}
+          <SaveButton onClick={handleSaveProfile} disabled={savingProfile}>
+            {savingProfile ? <Loader2 size={18} /> : <Save size={18} />} Save Changes
+          </SaveButton>
         </Section>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -213,13 +303,20 @@ const UserSettings = () => {
             <h3><Lock size={20} color="#00658d" /> Security</h3>
             <FormGroup>
               <label>Current Password</label>
-              <input type="password" placeholder="••••••••" />
+              <input type="password" placeholder="••••••••" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
             </FormGroup>
             <FormGroup>
               <label>New Password</label>
-              <input type="password" placeholder="Leave blank to keep current" />
+              <input type="password" placeholder="At least 8 characters" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
             </FormGroup>
-            <SaveButton style={{ background: '#e1f2ff', color: '#00658d' }}>Update Password</SaveButton>
+            {pwdMsg && (
+              <Feedback $error={pwdMsg.error}>
+                {!pwdMsg.error && <CheckCircle2 size={16} />} {pwdMsg.text}
+              </Feedback>
+            )}
+            <SaveButton onClick={handleUpdatePassword} disabled={savingPwd} style={{ background: '#e1f2ff', color: '#00658d' }}>
+              {savingPwd ? <Loader2 size={18} /> : null} Update Password
+            </SaveButton>
           </Section>
         </div>
       </SettingsGrid>

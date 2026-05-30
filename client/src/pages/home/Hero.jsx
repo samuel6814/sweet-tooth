@@ -275,8 +275,9 @@ const Hero = () => {
         </HeadlineWrapper>
 
         <ToothGraphic 
-          src="/tooth1.png" 
+          src="/tooth1.webp" 
           alt="Dental Care Splashing Tooth" 
+          fetchpriority="high"
           variants={popVariants}
           initial="hidden"
           animate="visible"

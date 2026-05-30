@@ -120,14 +120,14 @@ const CardImage = styled.img`
 
 const Treatments = () => {
   const treatments = [
-    { id: "braces", title: "Braces", bgColor: "#f0f4f8", tags: ["Alignment", "Orthodontic"], imgSrc: "/braces-boy.png", link: "/treatments/braces" },
-    { id: "invisalign", title: "Clear Aligners", bgColor: "#e2e6fa", tags: ["Alignment", "Invisible"], imgSrc: "/invisalign-girl.png", link: "/treatments/aligners" },
-    { id: "whitening", title: "Teeth Whitening", bgColor: "#fff4d2", tags: ["Cosmetic", "Fast Results"], imgSrc: "/whitening-smile.png", link: "/treatments/whitening" },
-    { id: "veneers", title: "Porcelain Veneers", bgColor: "#ffedd5", tags: ["Cosmetic", "Premium"], imgSrc: "/veneers-3d.png", link: "/treatments/veneers" },
-    { id: "implants", title: "Dental Implants", bgColor: "#dcfce7", tags: ["Surgical", "Permanent"], imgSrc: "/implant-3d.png", link: "/treatments/implants" },
-    { id: "dentures", title: "Dentures", bgColor: "#ffe4e6", tags: ["Restorative", "Removable"], imgSrc: "/dentures-3d.png", link: "/treatments/dentures" },
-    { id: "fillings", title: "Cavity Fillings", bgColor: "#e0f2fe", tags: ["Preventative", "Quick"], imgSrc: "/filling-3d.png", link: "/treatments/fillings" },
-    { id: "wisdom", title: "Wisdom Teeth", bgColor: "#f3f4f6", tags: ["Extraction", "Surgical"], imgSrc: "/wisdom-tooth-3d.png", link: "/treatments/wisdom-teeth" }
+    { id: "braces", title: "Braces", bgColor: "#f0f4f8", tags: ["Alignment", "Orthodontic"], imgSrc: "/braces-boy.webp", link: "/treatments/braces" },
+    { id: "invisalign", title: "Clear Aligners", bgColor: "#e2e6fa", tags: ["Alignment", "Invisible"], imgSrc: "/invisialign-girl.webp", link: "/treatments/aligners" },
+    { id: "whitening", title: "Teeth Whitening", bgColor: "#fff4d2", tags: ["Cosmetic", "Fast Results"], imgSrc: "/whitening-smile.webp", link: "/treatments/whitening" },
+    { id: "veneers", title: "Porcelain Veneers", bgColor: "#ffedd5", tags: ["Cosmetic", "Premium"], imgSrc: "/veneers-3d.webp", link: "/treatments/veneers" },
+    { id: "implants", title: "Dental Implants", bgColor: "#dcfce7", tags: ["Surgical", "Permanent"], imgSrc: "/implant-3d.webp", link: "/treatments/implants" },
+    { id: "dentures", title: "Dentures", bgColor: "#ffe4e6", tags: ["Restorative", "Removable"], imgSrc: "/dentures-3d.webp", link: "/treatments/dentures" },
+    { id: "fillings", title: "Cavity Fillings", bgColor: "#e0f2fe", tags: ["Preventative", "Quick"], imgSrc: "/filling-3d.webp", link: "/treatments/fillings" },
+    { id: "wisdom", title: "Wisdom Teeth", bgColor: "#f3f4f6", tags: ["Extraction", "Surgical"], imgSrc: "/wisdom-tooth-3d.webp", link: "/treatments/wisdom-teeth" }
   ];
 
   return (
@@ -156,7 +156,7 @@ const Treatments = () => {
                 </TagsContainer>
               </CardContent>
               <CardImageWrapper>
-                <CardImage src={item.imgSrc} alt={item.title} />
+                <CardImage src={item.imgSrc} alt={item.title} loading="lazy" decoding="async" />
               </CardImageWrapper>
             </TreatmentCard>
           ))}

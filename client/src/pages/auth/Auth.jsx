@@ -277,7 +277,7 @@ const Auth = () => {
       <MainContent>
         <AuthBox>
           <ImageSide>
-            <img src="/login-image.png" alt="Smiling patient showing perfect teeth" />
+            <img src="/login-image.webp" alt="Smiling patient showing perfect teeth" loading="lazy" decoding="async" />
             <div className="overlay" />
             <div className="text-content">
               <h2>Your Perfect Smile Awaits</h2>

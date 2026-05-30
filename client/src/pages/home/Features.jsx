@@ -162,7 +162,7 @@ const Features = () => {
       title: "Braces",
       bgColor: "#f0f4f8", // Light gray/blue
       tags: ["Alignment", "Orthodontic", "Long-term"],
-      imgSrc: "/braces-boy.png", 
+      imgSrc: "/braces-boy.webp", 
       link: "/treatments/braces"
     },
     {
@@ -170,7 +170,7 @@ const Features = () => {
       title: "Clear Aligners",
       bgColor: "#e2e6fa", // Light purple
       tags: ["Alignment", "Invisible", "Removable"],
-      imgSrc: "/invisialign-girl.png", 
+      imgSrc: "/invisialign-girl.webp", 
       link: "/treatments/aligners"
     },
     {
@@ -178,7 +178,7 @@ const Features = () => {
       title: "Teeth Whitening",
       bgColor: "#fff4d2", // Soft pastel yellow
       tags: ["Cosmetic", "Fast Results", "Non-invasive"],
-      imgSrc: "/whitening-smile.jpg", 
+      imgSrc: "/whitening-smile.webp", 
       link: "/treatments/whitening"
     },
     {
@@ -186,7 +186,7 @@ const Features = () => {
       title: "Porcelain Veneers",
       bgColor: "#ffedd5", // Soft peach
       tags: ["Cosmetic", "Restorative", "Premium"],
-      imgSrc: "/veneers-3d.png", 
+      imgSrc: "/veneers-3d.webp", 
       link: "/treatments/veneers"
     },
     {
@@ -194,7 +194,7 @@ const Features = () => {
       title: "Dental Implants",
       bgColor: "#dcfce7", // Light mint/cyan
       tags: ["Surgical", "Permanent", "Replacement"],
-      imgSrc: "/implant-3d.png", 
+      imgSrc: "/implant-3d.webp", 
       link: "/treatments/implants"
     },
     {
@@ -202,7 +202,7 @@ const Features = () => {
       title: "Dentures",
       bgColor: "#ffe4e6", // Light pink
       tags: ["Restorative", "Removable", "Full/Partial"],
-      imgSrc: "/dentures-3d.png", 
+      imgSrc: "/dentures-3d.webp", 
       link: "/treatments/dentures"
     },
     {
@@ -210,7 +210,7 @@ const Features = () => {
       title: "Cavity Fillings",
       bgColor: "#e0f2fe", // Light sky blue
       tags: ["General care", "Preventative", "Quick"],
-      imgSrc: "/filling-3d.png", 
+      imgSrc: "/filling-3d.webp", 
       link: "/treatments/fillings"
     },
     {
@@ -218,7 +218,7 @@ const Features = () => {
       title: "Wisdom Teeth",
       bgColor: "#f3f4f6", // Cool light gray
       tags: ["Extraction", "Surgical", "Pain Relief"],
-      imgSrc: "/wisdom-tooth-3d.png", 
+      imgSrc: "/wisdom-tooth-3d.webp", 
       link: "/treatments/wisdom-teeth"
     }
   ];
@@ -259,7 +259,7 @@ const Features = () => {
               </CardContent>
               
               <CardImageWrapper>
-                <CardImage src={item.imgSrc} alt={`${item.title} treatment illustration`} />
+                <CardImage src={item.imgSrc} alt={`${item.title} treatment illustration`} loading="lazy" decoding="async" />
               </CardImageWrapper>
             </TreatmentCard>
           ))}

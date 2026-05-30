@@ -15,7 +15,7 @@ const TREATMENTS = {
         description:
             "Comprehensive structural alignment solutions for a perfectly straight, healthy smile. Ideal for correcting overbites, underbites, and severe crowding.",
         duration: "12 - 24 Months",
-        cost: { min: 15000, max: 45000 },
+        cost: { min: 3000, max: 20000 },
         types: [
             { name: "Traditional Metal Braces", desc: "High-grade stainless steel brackets and wires that move teeth predictably.", target: "Best for: Severe crowding & complex cases." },
             { name: "Ceramic (Clear) Braces", desc: "Tooth-colored brackets that blend in with your enamel.", target: "Best for: Adults seeking a discreet option." },
@@ -28,8 +28,8 @@ const TREATMENTS = {
             { id: 2, name: "Interdental Brushes", price: 75, desc: "Essential for cleaning around wires." },
         ],
         localClinics: [
-            { id: 1, name: "Kumasi Premier Dental", address: "Bantama High St", distance: "1.2 km", rating: 4.8, reviews: 124, estPrice: 15500 },
-            { id: 2, name: "Oforikrom Smile Clinic", address: "Accra Rd, Oforikrom", distance: "3.5 km", rating: 4.6, reviews: 89, estPrice: 14200 },
+            { id: 1, name: "Kumasi Premier Dental", address: "Bantama High St", distance: "1.2 km", rating: 4.8, reviews: 124, estPrice: 6500 },
+            { id: 2, name: "Oforikrom Smile Clinic", address: "Accra Rd, Oforikrom", distance: "3.5 km", rating: 4.6, reviews: 89, estPrice: 5200 },
         ],
     },
 
@@ -42,7 +42,7 @@ const TREATMENTS = {
         description:
             "Virtually invisible, removable trays that gradually straighten your teeth without metal brackets. The modern, low-profile path to a confident smile.",
         duration: "6 - 18 Months",
-        cost: { min: 18000, max: 50000 },
+        cost: { min: 8000, max: 25000 },
         types: [
             { name: "Full Arch Aligners", desc: "A complete series of trays correcting both upper and lower arches.", target: "Best for: Moderate alignment issues." },
             { name: "Express / Touch-Up Trays", desc: "A short series for minor corrections or post-braces relapse.", target: "Best for: Small cosmetic fixes." },
@@ -56,8 +56,8 @@ const TREATMENTS = {
             { id: 3, name: "Chewies", price: 25, desc: "Helps trays seat fully for a precise fit." },
         ],
         localClinics: [
-            { id: 1, name: "Ashanti Orthodontics", address: "Adum, Kumasi", distance: "2.1 km", rating: 4.9, reviews: 156, estPrice: 22000 },
-            { id: 2, name: "Bright Align Studio", address: "Asokwa, Kumasi", distance: "4.0 km", rating: 4.7, reviews: 73, estPrice: 19500 },
+            { id: 1, name: "Ashanti Orthodontics", address: "Adum, Kumasi", distance: "2.1 km", rating: 4.9, reviews: 156, estPrice: 18000 },
+            { id: 2, name: "Bright Align Studio", address: "Asokwa, Kumasi", distance: "4.0 km", rating: 4.7, reviews: 73, estPrice: 14000 },
         ],
     },
 
@@ -70,7 +70,7 @@ const TREATMENTS = {
         description:
             "Professional-grade brightening that lifts years of stains from coffee, tea and aging. Fast, dramatic results for a radiant smile.",
         duration: "1 - 3 Sessions",
-        cost: { min: 1200, max: 6000 },
+        cost: { min: 600, max: 5000 },
         types: [
             { name: "In-Office Laser Whitening", desc: "High-concentration gel activated by light for instant results.", target: "Best for: Fastest, most dramatic lift." },
             { name: "Custom Take-Home Trays", desc: "Dentist-made trays with professional gel for gradual whitening.", target: "Best for: Controlled, budget-friendly results." },
@@ -97,7 +97,7 @@ const TREATMENTS = {
         description:
             "Ultra-thin, custom-crafted shells bonded to the front of your teeth to transform shape, color and symmetry into a flawless, premium smile.",
         duration: "2 - 4 Weeks",
-        cost: { min: 8000, max: 30000 },
+        cost: { min: 1800, max: 18000 },
         types: [
             { name: "Porcelain Veneers", desc: "Stain-resistant, lifelike shells that last 10-15 years.", target: "Best for: Long-term, natural results." },
             { name: "Composite Veneers", desc: "Resin sculpted directly onto the tooth in a single visit.", target: "Best for: Budget-conscious, quick fixes." },
@@ -124,7 +124,7 @@ const TREATMENTS = {
         description:
             "Permanent titanium tooth-root replacements topped with lifelike crowns. The gold standard for restoring missing teeth and full chewing function.",
         duration: "3 - 6 Months",
-        cost: { min: 20000, max: 70000 },
+        cost: { min: 4000, max: 31000 },
         types: [
             { name: "Single Tooth Implant", desc: "One titanium post and crown to replace a single missing tooth.", target: "Best for: Isolated tooth loss." },
             { name: "Implant-Supported Bridge", desc: "Two implants anchoring a bridge across several teeth.", target: "Best for: Multiple adjacent gaps." },
@@ -151,7 +151,7 @@ const TREATMENTS = {
         description:
             "Comfortable, custom-fitted removable replacements for missing teeth that restore your smile, speech and ability to eat with confidence.",
         duration: "3 - 6 Weeks",
-        cost: { min: 4000, max: 22000 },
+        cost: { min: 1000, max: 4000 },
         types: [
             { name: "Complete Dentures", desc: "A full set replacing all teeth in an arch.", target: "Best for: Total tooth loss." },
             { name: "Partial Dentures", desc: "Fills gaps while clasping onto remaining natural teeth.", target: "Best for: Several missing teeth." },
@@ -164,8 +164,8 @@ const TREATMENTS = {
             { id: 2, name: "Denture Soak Tablets", price: 80, desc: "Deep-cleans and freshens overnight." },
         ],
         localClinics: [
-            { id: 1, name: "Comfort Dental Prosthetics", address: "Tafo, Kumasi", distance: "4.7 km", rating: 4.5, reviews: 60, estPrice: 6500 },
-            { id: 2, name: "New Smile Denture Lab", address: "Suame, Kumasi", distance: "5.9 km", rating: 4.4, reviews: 48, estPrice: 5200 },
+            { id: 1, name: "Comfort Dental Prosthetics", address: "Tafo, Kumasi", distance: "4.7 km", rating: 4.5, reviews: 60, estPrice: 3500 },
+            { id: 2, name: "New Smile Denture Lab", address: "Suame, Kumasi", distance: "5.9 km", rating: 4.4, reviews: 48, estPrice: 2800 },
         ],
     },
 
@@ -178,7 +178,7 @@ const TREATMENTS = {
         description:
             "Quick, tooth-saving restorations that remove decay and seal cavities, stopping pain and preventing further damage in a single visit.",
         duration: "30 - 60 Minutes",
-        cost: { min: 300, max: 2500 },
+        cost: { min: 100, max: 700 },
         types: [
             { name: "Composite (Tooth-Colored)", desc: "Resin matched to your enamel for an invisible repair.", target: "Best for: Visible front teeth." },
             { name: "Amalgam (Silver)", desc: "Durable metal alloy filling for heavy-use molars.", target: "Best for: Back teeth on a budget." },
@@ -205,7 +205,7 @@ const TREATMENTS = {
         description:
             "Safe surgical removal of impacted or problematic third molars to relieve pain, prevent crowding and protect your overall oral health.",
         duration: "45 - 90 Minutes",
-        cost: { min: 2000, max: 15000 },
+        cost: { min: 250, max: 800 },
         types: [
             { name: "Simple Extraction", desc: "Removal of a fully erupted, accessible wisdom tooth.", target: "Best for: Teeth above the gumline." },
             { name: "Surgical Extraction", desc: "Incision-based removal of partially erupted teeth.", target: "Best for: Partially impacted molars." },
@@ -218,8 +218,8 @@ const TREATMENTS = {
             { id: 2, name: "Saltwater Rinse Kit", price: 40, desc: "Keeps extraction sites clean." },
         ],
         localClinics: [
-            { id: 1, name: "Oral Surgery Specialists", address: "Ridge, Kumasi", distance: "3.1 km", rating: 4.8, reviews: 110, estPrice: 4500 },
-            { id: 2, name: "Maxillofacial Care Centre", address: "Asokwa, Kumasi", distance: "5.5 km", rating: 4.6, reviews: 67, estPrice: 3800 },
+            { id: 1, name: "Oral Surgery Specialists", address: "Ridge, Kumasi", distance: "3.1 km", rating: 4.8, reviews: 110, estPrice: 650 },
+            { id: 2, name: "Maxillofacial Care Centre", address: "Asokwa, Kumasi", distance: "5.5 km", rating: 4.6, reviews: 67, estPrice: 550 },
         ],
     },
 };

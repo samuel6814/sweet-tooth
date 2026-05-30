@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authClient } from '../../lib/auth';
 import { 
   UploadCloud, 
@@ -303,6 +303,7 @@ const itemVariants = {
 
 const DashboardOverview = () => {
   const { data: session } = authClient.useSession();
+  const navigate = useNavigate();
   const firstName = session?.user?.name ? session.user.name.split(' ')[0] : 'there';
 
   return (
@@ -323,7 +324,7 @@ const DashboardOverview = () => {
           <CardHeader>
             <h3><Camera size={20} color="#00658d" /> New AI Analysis</h3>
           </CardHeader>
-          <UploadWidget>
+          <UploadWidget onClick={() => navigate('/scan')}>
             <div className="icon-wrapper">
               <UploadCloud size={32} />
             </div>
@@ -410,7 +411,7 @@ const DashboardOverview = () => {
                 borderRadius: '9999px',
                 fontWeight: '700',
                 cursor: 'pointer'
-              }}>
+              }} onClick={() => navigate('/dashboard/clinics')}>
                 Book Appointment
               </button>
             </ActionItem>
@@ -428,7 +429,7 @@ const DashboardOverview = () => {
                 borderRadius: '9999px',
                 fontWeight: '700',
                 cursor: 'pointer'
-              }}>
+              }} onClick={() => navigate('/dashboard/clinics')}>
                 Book Appointment
               </button>
             </ActionItem>

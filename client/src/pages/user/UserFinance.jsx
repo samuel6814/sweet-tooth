@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { Wallet, ShieldCheck, FileText, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Wallet, ShieldCheck, FileText } from 'lucide-react';
 import Currency from '../../components/Currency';
 
 const PageContainer = styled.div`
@@ -137,6 +138,7 @@ const EstimateRow = styled.div`
 `;
 
 const UserFinance = () => {
+  const navigate = useNavigate();
   return (
     <PageContainer>
       <Header>
@@ -147,7 +149,7 @@ const UserFinance = () => {
       <TopGrid>
         <SummaryCard $primary initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h3><Wallet size={20} /> Total Estimated Pathway</h3>
-          <p className="amount"><Currency amount={15000} /> - <Currency amount={45000} /></p>
+          <p className="amount"><Currency amount={3000} /> - <Currency amount={20000} /></p>
           <p>Based on your active Braces consultation in Kumasi.</p>
         </SummaryCard>
         
@@ -169,8 +171,8 @@ const UserFinance = () => {
             <span>Generated: May 15, 2026</span>
           </div>
           <div className="cost-details">
-            <span className="price"><Currency amount={15000} /> - <Currency amount={45000} /></span>
-            <button title="View Breakdown"><FileText size={18} /></button>
+            <span className="price"><Currency amount={3000} /> - <Currency amount={20000} /></span>
+            <button title="View Breakdown" onClick={() => navigate('/treatments/braces')}><FileText size={18} /></button>
           </div>
         </EstimateRow>
         
@@ -181,7 +183,7 @@ const UserFinance = () => {
           </div>
           <div className="cost-details">
             <span className="price"><Currency amount={800} /> - <Currency amount={2500} /></span>
-            <button title="View Breakdown"><FileText size={18} /></button>
+            <button title="View Breakdown" onClick={() => navigate('/treatments/whitening')}><FileText size={18} /></button>
           </div>
         </EstimateRow>
       </EstimatesList>

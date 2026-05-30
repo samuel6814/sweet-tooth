@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, ChevronRight, Activity, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const PageContainer = styled.div`
@@ -165,6 +166,7 @@ const itemVariants = {
 
 const MyScans = () => {
   const [scans, setScans] = React.useState([]);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/scans`)
@@ -180,7 +182,7 @@ const MyScans = () => {
           <h1>My AI Scans</h1>
           <p>Track your oral health progress and review past diagnostic reports.</p>
         </div>
-        <button>+ New Scan</button>
+        <button onClick={() => navigate('/scan')}>+ New Scan</button>
       </Header>
 
       <ScansGrid variants={containerVariants} initial="hidden" animate="visible">
@@ -200,7 +202,7 @@ const MyScans = () => {
                   <div key={`imp-${i}`}><CheckCircle2 size={16} className="success"/> {imp}</div>
                 ))}
               </div>
-              <button className="view-btn">Full AI Report <ChevronRight size={18} /></button>
+              <button className="view-btn" onClick={() => navigate('/scan')}>Full AI Report <ChevronRight size={18} /></button>
             </ScanDetails>
           </ScanCard>
         ))}

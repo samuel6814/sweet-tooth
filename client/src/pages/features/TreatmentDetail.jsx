@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Clock, 
@@ -14,7 +14,8 @@ import {
   Bot,
   MapPin,
   Star,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
 
 import Navbar from '../../components/Navbar';
@@ -509,10 +510,14 @@ const SendButton = styled.button`
 
 const TreatmentDetail = () => {
   const { slug = 'braces' } = useParams();
+  const navigate = useNavigate();
   const [treatmentData, setTreatmentData] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
+  const [isSending, setIsSending] = useState(false);
+  const fileInputRef = React.useRef(null);
+  const messagesEndRef = React.useRef(null);
 
   React.useEffect(() => {
     setTreatmentData(null);
@@ -538,20 +543,74 @@ const TreatmentDetail = () => {
       });
   }, [slug]);
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
-    
-    const newUserMsg = { id: Date.now(), sender: 'user', text: inputText };
-    setMessages(prev => [...prev, newUserMsg]);
-    setInputText("");
+  React.useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isSending]);
 
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: Date.now() + 1,
-        sender: 'bot',
-        text: "I can definitely help with that. To give you the most accurate cost and timeline prediction for your specific case, please click the paperclip icon below to upload a scan or clear photo of your teeth."
-      }]);
-    }, 1000);
+  const sendToAI = async ({ text, image }) => {
+    if (isSending) return;
+
+    const userMsg = { id: Date.now(), sender: 'user', text: text || '', image: image || null };
+    const priorHistory = messages.map((m) => ({ role: m.sender === 'bot' ? 'model' : 'user', text: m.text }));
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInputText('');
+    setIsSending(true);
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/ai/treatment-chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          treatment: treatmentData,
+          message: text || '',
+          image: image || null,
+          history: priorHistory,
+        }),
+      });
+      const data = await res.json();
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          sender: 'bot',
+          text: res.ok ? data.reply : data.error || 'Something went wrong. Please try again.',
+        },
+      ]);
+    } catch (err) {
+      console.error(err);
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now() + 1, sender: 'bot', text: 'I could not reach the AI service. Please check your connection and try again.' },
+      ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleSend = () => {
+    if (!inputText.trim() || isSending) return;
+    sendToAI({ text: inputText.trim() });
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      sendToAI({ text: inputText.trim(), image: reader.result });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerUpload = () => {
+    if (!isSending) fileInputRef.current?.click();
+  };
+
+  const handleBookClinic = (clinic) => {
+    const q = encodeURIComponent(`${clinic.name} ${clinic.address || ''}`.trim());
+    window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank', 'noopener');
   };
 
   if (notFound) {
@@ -662,7 +721,7 @@ const TreatmentDetail = () => {
                   <h3><MapPin size={32} color="#00658d"/> Nearby Specialists</h3>
                   <div className="loc-info">Searching near: Kumasi, Ashanti Region</div>
                 </div>
-                <button className="change-btn">Change Area</button>
+                <button className="change-btn" onClick={() => navigate('/dashboard/clinics')}>Change Area</button>
               </LocationHeader>
               
               <ClinicList>
@@ -680,7 +739,7 @@ const TreatmentDetail = () => {
                     </div>
                     <div className="clinic-action">
                       <p className="price"><Currency amount={clinic.estPrice} /></p>
-                      <button>Book Consult <ArrowRight size={16} /></button>
+                      <button onClick={() => handleBookClinic(clinic)}>Book Consult <ArrowRight size={16} /></button>
                     </div>
                   </ClinicCard>
                 ))}
@@ -712,25 +771,54 @@ const TreatmentDetail = () => {
                           <img src={msg.image} alt="User uploaded scan" />
                         </UploadPreview>
                       )}
-                      <Message $isBot={msg.sender === 'bot'}>{msg.text}</Message>
+                      {msg.text && <Message $isBot={msg.sender === 'bot'}>{msg.text}</Message>}
                     </motion.div>
                   ))}
+                  {isSending && (
+                    <motion.div
+                      key="typing"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      style={{ alignSelf: 'flex-start' }}
+                    >
+                      <Message $isBot style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                          style={{ display: 'inline-flex' }}
+                        >
+                          <Loader2 size={16} />
+                        </motion.span>
+                        Analyzing...
+                      </Message>
+                    </motion.div>
+                  )}
                 </AnimatePresence>
+                <div ref={messagesEndRef} />
               </ChatMessages>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleImageSelect}
+              />
 
               <ChatInputArea>
                 <InputWrapper>
-                  <button className="upload-btn" title="Upload Scan"><Paperclip size={20} /></button>
+                  <button className="upload-btn" title="Upload Scan" onClick={triggerUpload} disabled={isSending}><Paperclip size={20} /></button>
                   <input 
                     type="text" 
                     placeholder={`Ask about ${treatmentData.chatTopic || 'this treatment'} or upload your scan...`}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                    disabled={isSending}
                   />
-                  <button className="upload-btn" title="Take Photo"><ImageIcon size={20} /></button>
+                  <button className="upload-btn" title="Upload Photo" onClick={triggerUpload} disabled={isSending}><ImageIcon size={20} /></button>
                 </InputWrapper>
-                <SendButton onClick={handleSend}><Send size={20} /></SendButton>
+                <SendButton onClick={handleSend} disabled={isSending} style={{ opacity: isSending ? 0.6 : 1 }}><Send size={20} /></SendButton>
               </ChatInputArea>
             </ChatInterface>
           </AIColumn>
