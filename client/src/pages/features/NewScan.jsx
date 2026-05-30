@@ -14,6 +14,11 @@ import {
 } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import Currency from '../../components/Currency';
+
+// The scan API returns product prices in USD; convert to GHS for display.
+// Retail/card market rate, Ghana (late May 2026). Update as needed.
+const USD_TO_GHS_RATE = 12.2;
 
 const PageContainer = styled.div`
   min-height: 100vh;
@@ -494,7 +499,11 @@ const NewScan = () => {
                           >
                             <span className="cat">{p.category}</span>
                             <span className="name">{p.name}</span>
-                            {p.price != null && <span className="price">${p.price}</span>}
+                            {p.price != null && (
+                              <span className="price">
+                                <Currency amount={Number(p.price) * USD_TO_GHS_RATE} />
+                              </span>
+                            )}
                           </ProductCard>
                         ))}
                       </ProductsGrid>
