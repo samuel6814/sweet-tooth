@@ -1,0 +1,754 @@
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Clock, 
+  Banknote, 
+  Sparkles, 
+  AlertTriangle, 
+  CheckCircle2,
+  Send,
+  Image as ImageIcon,
+  Paperclip,
+  Bot,
+  MapPin,
+  Star,
+  ArrowRight
+} from 'lucide-react';
+
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import Currency from '../../components/Currency'; 
+
+// --- Styled Components ---
+
+const PageContainer = styled.div`
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f7f9fb;
+`;
+
+const Content = styled.main`
+  flex: 1;
+  padding: 10rem 1.25rem 6rem 1.25rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  @media (min-width: 768px) { padding: 12rem 2rem 6rem 2rem; }
+`;
+
+const Header = styled.div`
+  margin-bottom: 3rem;
+  max-width: 800px;
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5vw, 4.5rem);
+    color: #00658d;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+  }
+  
+  p {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 1.2rem;
+    color: #3e4850;
+    line-height: 1.6;
+  }
+`;
+
+const LayoutGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: 1.2fr 1fr;
+    align-items: start;
+  }
+`;
+
+const InfoColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+`;
+
+const QuickStats = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+`;
+
+const StatCard = styled.div`
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid #e0e3e5;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .icon-box {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: #e1f2ff;
+    color: #00658d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  h4 {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 0.9rem;
+    color: #3e4850;
+    margin: 0 0 0.25rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  p {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #191c1e;
+    margin: 0;
+  }
+`;
+
+const SectionBox = styled.div`
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid #e0e3e5;
+
+  h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: #191c1e;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+`;
+
+const TypesGrid = styled.div`
+  display: grid;
+  gap: 1.5rem;
+`;
+
+const TypeItem = styled.div`
+  background: #f7f9fb;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border-left: 4px solid #00658d;
+
+  h4 {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #00658d;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-family: 'Hanken Grotesk', sans-serif;
+    color: #3e4850;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.5;
+  }
+
+  .target {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ff5722;
+  }
+`;
+
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 1.05rem;
+    color: #3e4850;
+    line-height: 1.5;
+  }
+`;
+
+const LocationHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e3e5;
+
+  .loc-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #00658d;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-weight: 600;
+  }
+
+  .change-btn {
+    background: none;
+    border: none;
+    color: #ff5722;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    &:hover { text-decoration: underline; }
+  }
+`;
+
+const ClinicList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const ClinicCard = styled.div`
+  background: #f7f9fb;
+  border: 1px solid #e0e3e5;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 101, 141, 0.05);
+    border-color: #26b1ff;
+  }
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .clinic-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    h4 {
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #191c1e;
+      margin: 0;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 0.9rem;
+      color: #3e4850;
+
+      .rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #f59e0b;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .clinic-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    
+    @media (min-width: 640px) { align-items: flex-end; }
+
+    .price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: #00658d;
+      margin: 0;
+      line-height: 1;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background: #ff5722;
+      color: white;
+      border: none;
+      border-radius: 9999px;
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s;
+
+      &:hover { background: #f4511e; }
+    }
+  }
+`;
+
+const ProductGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+`;
+
+const ProductCard = styled.div`
+  background: #f7f9fb;
+  border: 1px solid #e0e3e5;
+  padding: 1rem;
+  border-radius: 1rem;
+  text-align: center;
+
+  h5 { font-family: 'Hanken Grotesk', sans-serif; font-size: 1rem; margin: 0.5rem 0; color: #191c1e; }
+  p { font-size: 0.85rem; color: #8fa3b0; margin-bottom: 0.5rem; }
+  .price { font-weight: 700; color: #00658d; }
+`;
+
+const AIColumn = styled.div`
+  position: sticky;
+  top: 8rem; 
+`;
+
+const ChatInterface = styled.div`
+  background: #ffffff;
+  border-radius: 2rem;
+  border: 1px solid #e0e3e5;
+  box-shadow: 0 20px 40px rgba(0, 101, 141, 0.08);
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+const ChatHeader = styled.div`
+  background: linear-gradient(135deg, #00658d 0%, #004c6b 100%);
+  padding: 1.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .bot-icon {
+    width: 3rem;
+    height: 3rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  h3 {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  span {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+`;
+
+const ChatMessages = styled.div`
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #fcfdfd;
+`;
+
+const Message = styled.div`
+  max-width: 80%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  
+  ${(props) => props.$isBot ? `
+    background-color: #e1f2ff;
+    color: #003e58;
+    align-self: flex-start;
+    border-bottom-left-radius: 0.25rem;
+  ` : `
+    background-color: #ff5722;
+    color: #ffffff;
+    align-self: flex-end;
+    border-bottom-right-radius: 0.25rem;
+  `}
+`;
+
+const UploadPreview = styled.div`
+  align-self: flex-end;
+  width: 200px;
+  height: 150px;
+  background-color: #e0e3e5;
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8fa3b0;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const ChatInputArea = styled.div`
+  padding: 1.5rem;
+  background: #ffffff;
+  border-top: 1px solid #e0e3e5;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+`;
+
+const InputWrapper = styled.div`
+  flex: 1;
+  background: #f2f4f6;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+
+  &:focus-within {
+    border-color: #26b1ff;
+    background: #ffffff;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.5rem;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    color: #191c1e;
+    
+    &::placeholder { color: #a0aab2; }
+  }
+
+  .upload-btn {
+    background: none;
+    border: none;
+    color: #8fa3b0;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    
+    &:hover { color: #00658d; }
+  }
+`;
+
+const SendButton = styled.button`
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: #ff5722;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+
+  &:hover { background: #f4511e; }
+  &:active { transform: scale(0.95); }
+`;
+
+// --- Mock Data ---
+
+const MOCK_TREATMENT_DATA = {
+  title: "Orthodontic Braces",
+  description: "Comprehensive structural alignment solutions for a perfectly straight, healthy smile. Ideal for correcting overbites, underbites, and severe crowding.",
+  duration: "12 - 24 Months",
+  cost: {
+    min: 15000, 
+    max: 45000
+  },
+  types: [
+    {
+      name: "Traditional Metal Braces",
+      desc: "High-grade stainless steel brackets and wires. The most durable and widely used system.",
+      target: "Best for: Severe crowding and complex bite issues."
+    },
+    {
+      name: "Ceramic (Clear) Braces",
+      desc: "Functions exactly like metal braces but uses tooth-colored or clear brackets to blend in with your teeth.",
+      target: "Best for: Adults and older teens seeking a less noticeable option."
+    },
+    {
+      name: "Lingual Braces",
+      desc: "Custom-made brackets attached to the back (inside) of the teeth, rendering them completely invisible from the front.",
+      target: "Best for: Professionals requiring maximum aesthetic discretion."
+    }
+  ],
+  benefits: [
+    "Dramatically improves bite function and chewing efficiency.",
+    "Makes teeth easier to clean, reducing long-term risk of cavities.",
+    "Corrects jaw alignment, alleviating potential jaw pain or TMJ issues.",
+    "Provides a permanent, highly aesthetic resulting smile."
+  ],
+  sideEffects: [
+    "Mild soreness for 3-5 days after adjustments.",
+    "Requires significant dedication to oral hygiene (flossing takes longer).",
+    "Dietary restrictions (avoiding hard, sticky, or chewy foods).",
+    "Slight speech impediment during the initial adjustment week."
+  ],
+  products: [
+    { id: 1, name: "Orthodontic Wax", price: 45, desc: "Relieves irritation from brackets." },
+    { id: 2, name: "Interdental Brushes", price: 75, desc: "Essential for cleaning around wires." },
+    { id: 3, name: "Fluoride Mouthwash", price: 120, desc: "Strengthens enamel during treatment." }
+  ],
+  localClinics: [
+    { id: 1, name: "Kumasi Premier Dental", address: "Bantama High St", distance: "1.2 km", rating: 4.8, reviews: 124, estPrice: 15500 },
+    { id: 2, name: "Oforikrom Smile Clinic", address: "Accra Rd, Oforikrom", distance: "3.5 km", rating: 4.6, reviews: 89, estPrice: 14200 },
+    { id: 3, name: "Ashanti Orthodontics", address: "Adum", distance: "4.1 km", rating: 4.9, reviews: 210, estPrice: 16000 }
+  ]
+};
+
+const TreatmentDetail = () => {
+  const [inputText, setInputText] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: 'bot',
+      text: "Hi! I'm your Sweet Tooth AI consultant. Upload a clear photo of your teeth, or ask me any specific questions you have about getting braces, and I'll give you a personalized analysis."
+    }
+  ]);
+
+  const handleSend = () => {
+    if (!inputText.trim()) return;
+    
+    const newUserMsg = { id: Date.now(), sender: 'user', text: inputText };
+    setMessages(prev => [...prev, newUserMsg]);
+    setInputText("");
+
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        sender: 'bot',
+        text: "I can definitely help with that. To give you the most accurate cost and timeline prediction for your specific case, please click the paperclip icon below to upload a scan or clear photo of your teeth."
+      }]);
+    }, 1000);
+  };
+
+  return (
+    <PageContainer>
+      <Navbar />
+      <Content>
+        <Header>
+          <h1>{MOCK_TREATMENT_DATA.title}</h1>
+          <p>{MOCK_TREATMENT_DATA.description}</p>
+        </Header>
+
+        <LayoutGrid>
+          <InfoColumn>
+            <QuickStats>
+              <StatCard>
+                <div className="icon-box"><Clock size={24} /></div>
+                <div>
+                  <h4>Avg. Duration</h4>
+                  <p>{MOCK_TREATMENT_DATA.duration}</p>
+                </div>
+              </StatCard>
+              <StatCard>
+                <div className="icon-box"><Banknote size={24} /></div>
+                <div>
+                  <h4>Est. Cost Range</h4>
+                  <p>
+                    <Currency amount={MOCK_TREATMENT_DATA.cost.min} /> - <Currency amount={MOCK_TREATMENT_DATA.cost.max} />
+                  </p>
+                </div>
+              </StatCard>
+            </QuickStats>
+
+            <SectionBox>
+              <h3><Sparkles size={32} color="#ff5722"/> Types of Braces</h3>
+              <TypesGrid>
+                {MOCK_TREATMENT_DATA.types.map((type, i) => (
+                  <TypeItem key={i}>
+                    <h4>{type.name}</h4>
+                    <p>{type.desc}</p>
+                    <span className="target">{type.target}</span>
+                  </TypeItem>
+                ))}
+              </TypesGrid>
+            </SectionBox>
+
+            <SectionBox>
+              <h3><CheckCircle2 size={32} color="#00658d"/> Long-term Benefits</h3>
+              <List>
+                {MOCK_TREATMENT_DATA.benefits.map((benefit, i) => (
+                  <li key={i}>
+                    <CheckCircle2 size={20} color="#ff5722" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </List>
+            </SectionBox>
+
+            <SectionBox>
+              <h3><AlertTriangle size={32} color="#00658d"/> Things to Consider</h3>
+              <List>
+                {MOCK_TREATMENT_DATA.sideEffects.map((effect, i) => (
+                  <li key={i}>
+                    <AlertTriangle size={20} color="#ff5722" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <span>{effect}</span>
+                  </li>
+                ))}
+              </List>
+            </SectionBox>
+
+            <SectionBox>
+              <h3><Sparkles size={32} color="#00658d"/> Recommended Care</h3>
+              <p style={{ color: '#3e4850', fontSize: '0.95rem' }}>
+                Maintain optimal oral health during your orthodontic journey with these essentials.
+              </p>
+              <ProductGrid>
+                {MOCK_TREATMENT_DATA.products.map((product) => (
+                  <ProductCard key={product.id}>
+                    <h5>{product.name}</h5>
+                    <p>{product.desc}</p>
+                    <div className="price"><Currency amount={product.price} /></div>
+                  </ProductCard>
+                ))}
+              </ProductGrid>
+            </SectionBox>
+
+            <SectionBox>
+              <LocationHeader>
+                <div>
+                  <h3><MapPin size={32} color="#00658d"/> Nearby Specialists</h3>
+                  <div className="loc-info">Searching near: Kumasi, Ashanti Region</div>
+                </div>
+                <button className="change-btn">Change Area</button>
+              </LocationHeader>
+              
+              <ClinicList>
+                {MOCK_TREATMENT_DATA.localClinics.map((clinic) => (
+                  <ClinicCard key={clinic.id}>
+                    <div className="clinic-details">
+                      <h4>{clinic.name}</h4>
+                      <div className="meta">
+                        <span className="rating"><Star size={16} fill="#f59e0b" /> {clinic.rating} ({clinic.reviews})</span>
+                        <span>•</span>
+                        <span>{clinic.distance}</span>
+                        <span>•</span>
+                        <span>{clinic.address}</span>
+                      </div>
+                    </div>
+                    <div className="clinic-action">
+                      <p className="price"><Currency amount={clinic.estPrice} /></p>
+                      <button>Book Consult <ArrowRight size={16} /></button>
+                    </div>
+                  </ClinicCard>
+                ))}
+              </ClinicList>
+            </SectionBox>
+          </InfoColumn>
+
+          <AIColumn>
+            <ChatInterface>
+              <ChatHeader>
+                <div className="bot-icon"><Bot size={28} /></div>
+                <div>
+                  <h3>AI Treatment Analyst</h3>
+                  <span>Online • Ready to scan</span>
+                </div>
+              </ChatHeader>
+
+              <ChatMessages>
+                <AnimatePresence>
+                  {messages.map((msg) => (
+                    <motion.div 
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      style={{ display: 'flex', flexDirection: 'column' }}
+                    >
+                      {msg.image && (
+                        <UploadPreview>
+                          <img src={msg.image} alt="User uploaded scan" />
+                        </UploadPreview>
+                      )}
+                      <Message $isBot={msg.sender === 'bot'}>{msg.text}</Message>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </ChatMessages>
+
+              <ChatInputArea>
+                <InputWrapper>
+                  <button className="upload-btn" title="Upload Scan"><Paperclip size={20} /></button>
+                  <input 
+                    type="text" 
+                    placeholder="Ask about braces or upload your scan..." 
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                  />
+                  <button className="upload-btn" title="Take Photo"><ImageIcon size={20} /></button>
+                </InputWrapper>
+                <SendButton onClick={handleSend}><Send size={20} /></SendButton>
+              </ChatInputArea>
+            </ChatInterface>
+          </AIColumn>
+        </LayoutGrid>
+      </Content>
+      <Footer />
+    </PageContainer>
+  );
+};
+
+export default TreatmentDetail;
